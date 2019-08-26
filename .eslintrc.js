@@ -1,20 +1,20 @@
 module.exports = {
   env: {
     es6: true,
-    jest: true
+    jest: true,
   },
   extends: ['airbnb', 'prettier', 'prettier/react'],
   globals: {
     Atomics: 'readonly',
     SharedArrayBuffer: 'readonly',
-    __DEV__: true
+    __DEV__: true,
   },
   parserOptions: {
     ecmaFeatures: {
-      jsx: true
+      jsx: true,
     },
     ecmaVersion: 2018,
-    sourceType: 'module'
+    sourceType: 'module',
   },
   plugins: ['react', 'jsx-a11y', 'import', 'react-hooks', 'prettier'],
   rules: {
@@ -30,13 +30,13 @@ module.exports = {
     camelcase: 'off',
     'no-console': ['error', { allow: ['tron'] }],
     'react-hooks/rules-of-hooks': 'error',
-    'react-hooks/exhaustive-deps': 'warn'
-  }
-  // settings: {
-  //   'import/resolver': {
-  //     'babel-plugin-root-import': {
-  //       rootPathSuffix: 'src',
-  //     },
-  //   },
-  // },
+    'react-hooks/exhaustive-deps': 'warn',
+  },
+  settings: {
+    'import/resolver': {
+      'babel-plugin-root-import': {
+        rootPathSuffix: 'src',
+      },
+    },
+  },
 };
