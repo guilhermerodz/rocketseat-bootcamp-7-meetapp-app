@@ -45,7 +45,7 @@ export function* signUp({ payload }) {
     yield put(signUpSuccess());
 
     // history.push('/login');
-    Alert('Success', "Congratulations! You're registered!");
+    Alert.alert('Success', "Congratulations! You're registered!");
   } catch (err) {
     Alert.alert(
       "Can't sign up",
