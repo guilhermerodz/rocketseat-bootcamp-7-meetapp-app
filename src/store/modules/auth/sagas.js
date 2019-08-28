@@ -1,5 +1,5 @@
-import { Alert } from 'react-native';
 import { takeLatest, call, put, all } from 'redux-saga/effects';
+import { showMessage } from 'react-native-flash-message';
 
 import api from '~/services/api';
 
@@ -24,10 +24,10 @@ export function* signIn({ payload }) {
 
     // history.push('/dashboard');
   } catch (err) {
-    Alert.alert(
-      "Can't login",
-      getError(err) || 'Something is wrong... Check your credentials.'
-    );
+    showMessage({
+      type: 'danger',
+      message: getError(err) || 'Something is wrong... Check your credentials.',
+    });
     yield put(signFailure());
   }
 }
@@ -45,12 +45,15 @@ export function* signUp({ payload }) {
     yield put(signUpSuccess());
 
     // history.push('/login');
-    Alert.alert('Success', "Congratulations! You're registered!");
+    showMessage({
+      type: 'success',
+      message: "Congratulations! You're registered!",
+    });
   } catch (err) {
-    Alert.alert(
-      "Can't sign up",
-      getError(err) || 'Sorry, something is wrong. Try again later!'
-    );
+    showMessage({
+      type: 'danger',
+      message: getError(err) || 'Something is wrong... Check your credentials.',
+    });
 
     yield put(signFailure());
   }

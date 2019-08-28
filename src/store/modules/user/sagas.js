@@ -1,5 +1,5 @@
-import { Alert } from 'react-native';
 import { takeLatest, call, put, all } from 'redux-saga/effects';
+import { showMessage } from 'react-native-flash-message';
 
 import api from '~/services/api';
 
@@ -20,14 +20,17 @@ export function* updateProfile({ payload }) {
 
     const response = yield call(api.put, 'users', profile);
 
-    Alert.alert('Success', 'Profile successfully updated!');
+    showMessage({
+      type: 'success',
+      message: 'Profile successfully updated!',
+    });
 
     yield put(updateProfileSuccess(response.data));
   } catch (err) {
-    Alert.alert(
-      "Can't update",
-      getError(err) || 'Something is wrong... Check your credentials.'
-    );
+    showMessage({
+      type: 'danger',
+      message: getError(err) || 'Something is wrong... Check your credentials.',
+    });
 
     yield put(updateProfileFailure());
   }
