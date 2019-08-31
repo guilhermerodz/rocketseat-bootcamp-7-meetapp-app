@@ -72,7 +72,10 @@ export function setToken({ payload }) {
 }
 
 export function signOut() {
-  // history.push('/login');
+  showMessage({
+    type: 'default',
+    message: 'See ya!',
+  });
 }
 
 export default all([
