@@ -36,18 +36,22 @@ export function* signUp({ payload }) {
   try {
     const { name, email, password } = payload;
 
-    yield call(api.post, 'users', {
+    const response = yield call(api.post, 'users', {
       name,
       email,
       password,
     });
 
-    yield put(signUpSuccess());
+    const { token, user } = response.data;
 
-    // history.push('/login');
+    api.defaults.headers.Authorization = `Bearer ${token}`;
+
+    yield put(signUpSuccess());
+    yield put(signInSuccess(token, user));
+
     showMessage({
       type: 'success',
-      message: "Congratulations! You're registered!",
+      message: `Hey ${user.name}! Let's dive into MeetApp!`,
     });
   } catch (err) {
     showMessage({
