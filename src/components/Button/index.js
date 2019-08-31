@@ -4,9 +4,9 @@ import PropTypes from 'prop-types';
 
 import { Container, Text } from './styles';
 
-export default function Button({ children, loading, color, ...rest }) {
+export default function Button({ children, loading, ...rest }) {
   return (
-    <Container color={color} {...rest}>
+    <Container {...rest}>
       {loading ? (
         <ActivityIndicator size="small" color="#fff" />
       ) : (
