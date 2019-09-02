@@ -1,7 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { showMessage } from 'react-native-flash-message';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { parseISO, format, subDays, addDays } from 'date-fns';
+import {
+  parseISO,
+  format,
+  subDays,
+  addDays,
+  isBefore,
+  startOfDay,
+} from 'date-fns';
 import us from 'date-fns/locale/en-US';
 
 import api from '~/services/api';
@@ -33,6 +40,11 @@ export default function Dashboard() {
   const [refreshCount, setRefreshCount] = useState(0);
 
   const [hasMore, setHasMore] = useState(true);
+
+  const allowBackward = useMemo(
+    () => isBefore(startOfDay(new Date()), subDays(date, 1)),
+    [date]
+  );
 
   useEffect(() => {
     setMeetups([]);
@@ -98,11 +110,18 @@ export default function Dashboard() {
 
       <Container>
         <DateSelect>
-          <DateButton onPress={() => setDate(subDays(date, 1))}>
-            <Icon name="chevron-left" size={25} color="#F94D6A" />
+          <DateButton
+            onPress={() => allowBackward && setDate(subDays(date, 1))}
+          >
+            <Icon
+              style={{ opacity: allowBackward ? 1 : 0.3 }}
+              name="chevron-left"
+              size={25}
+              color="#F94D6A"
+            />
           </DateButton>
           <DateText>{format(date, 'MM/dd/yy')}</DateText>
-          <DateButton onPress={() => setDate(addDays(date, 1))}>
+          <DateButton onPress={() => setDate(addDays(date, 1))} allow>
             <Icon name="chevron-right" size={25} color="#F94D6A" />
           </DateButton>
         </DateSelect>
