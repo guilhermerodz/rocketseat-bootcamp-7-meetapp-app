@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { withNavigationFocus } from 'react-navigation';
 import { showMessage } from 'react-native-flash-message';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {
@@ -29,7 +30,7 @@ import {
   EmptyText,
 } from './styles';
 
-export default function Dashboard() {
+function Dashboard({ isFocused }) {
   const [loading, setLoading] = useState(true);
 
   const [date, setDate] = useState(new Date());
@@ -77,7 +78,7 @@ export default function Dashboard() {
     }
 
     loadMeetups();
-  }, [date, page, refreshCount]);
+  }, [date, page, refreshCount, isFocused]);
 
   async function handleRefresh() {
     setRefreshing(true);
@@ -169,3 +170,5 @@ Dashboard.navigationOptions = {
     <Icon name="format-list-bulleted" size={20} color={tintColor} />
   ),
 };
+
+export default withNavigationFocus(Dashboard);
