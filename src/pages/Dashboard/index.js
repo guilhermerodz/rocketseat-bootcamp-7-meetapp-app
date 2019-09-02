@@ -1,13 +1,147 @@
-import React from 'react';
-
+import React, { useState, useEffect } from 'react';
+import { showMessage } from 'react-native-flash-message';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { parseISO, format, subDays, addDays } from 'date-fns';
+import us from 'date-fns/locale/en-US';
+
+import api from '~/services/api';
+import { getError } from '~/util/errorHandler';
 
 import Background from '~/components/Background';
+import Header from '~/components/Header';
+import Loading from '~/components/Loading';
+import Meetup from '~/components/Meetup';
 
-// import { Container } from './styles';
+import {
+  Container,
+  DateSelect,
+  DateButton,
+  DateText,
+  List,
+  Empty,
+  EmptyText,
+} from './styles';
 
 export default function Dashboard() {
-  return <Background />;
+  const [loading, setLoading] = useState(true);
+
+  const [date, setDate] = useState(new Date());
+  const [page, setPage] = useState(1);
+  const [meetups, setMeetups] = useState([]);
+
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshCount, setRefreshCount] = useState(0);
+
+  const [hasMore, setHasMore] = useState(true);
+
+  useEffect(() => {
+    setMeetups([]);
+    setPage(1);
+  }, [date]);
+
+  useEffect(() => {
+    async function loadMeetups() {
+      setLoading(true);
+
+      const response = await api.get('available', {
+        params: { date, page },
+      });
+
+      setMeetups(oldMeetups =>
+        oldMeetups.concat(
+          response.data
+            .filter(meetup => !meetup.subscribed)
+            .map(meetup => ({
+              ...meetup,
+              formattedDate: format(parseISO(meetup.date), 'H:mm aa', {
+                locale: us,
+              }),
+            }))
+        )
+      );
+      setHasMore(response.data.length > 0);
+      setLoading(false);
+      setRefreshing(false);
+    }
+
+    loadMeetups();
+  }, [date, page, refreshCount]);
+
+  async function handleRefresh() {
+    setRefreshing(true);
+    setMeetups([]);
+    setRefreshCount(refreshCount + 1);
+  }
+
+  async function handleSubscribe(id) {
+    try {
+      const response = await api.post(`subscriptions/${id}`);
+
+      showMessage({
+        type: 'success',
+        message: `Congratulations! Subscribed into ${response.data.title}!`,
+      });
+
+      setMeetups(meetups.filter(meetup => meetup.id !== id));
+    } catch (err) {
+      showMessage({
+        type: 'danger',
+        message:
+          getError(err) || 'Something is wrong... Sorry, try again later.',
+      });
+    }
+  }
+
+  return (
+    <Background>
+      <Header />
+
+      <Container>
+        <DateSelect>
+          <DateButton onPress={() => setDate(subDays(date, 1))}>
+            <Icon name="chevron-left" size={25} color="#F94D6A" />
+          </DateButton>
+          <DateText>{format(date, 'MM/dd/yy')}</DateText>
+          <DateButton onPress={() => setDate(addDays(date, 1))}>
+            <Icon name="chevron-right" size={25} color="#F94D6A" />
+          </DateButton>
+        </DateSelect>
+
+        {loading && <Loading />}
+
+        {meetups.length ? (
+          <List
+            data={meetups}
+            keyExtractor={item => String(item.id)}
+            renderItem={({ item }) => (
+              <Meetup
+                banner={item.banner}
+                title={item.title}
+                formattedDate={item.formattedDate}
+                location={item.location}
+                owner={item.owner}
+                past={item.past}
+                handleSubscribe={() => handleSubscribe(item.id)}
+              />
+            )}
+            onRefresh={handleRefresh}
+            refreshing={refreshing}
+            onEndReached={() => hasMore && setPage(page + 1)}
+            onEndReachedThreshold={0.2}
+          />
+        ) : (
+          <Empty>
+            <Icon
+              name="event-busy"
+              size={50}
+              color="rgba(255, 255, 255, 0.1)"
+            />
+            <EmptyText>There are no meetups for this date yet.</EmptyText>
+          </Empty>
+        )}
+      </Container>
+    </Background>
+  );
 }
 
 Dashboard.navigationOptions = {
