@@ -39,7 +39,7 @@ export default function Profile() {
   }, [profile]);
 
   function handleSubmit() {
-    if (oldPassword === confirmPassword) {
+    if (oldPassword.length > 0 && oldPassword === confirmPassword) {
       showMessage({
         type: 'danger',
         message: 'Please insert a different new password!',
