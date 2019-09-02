@@ -24,6 +24,8 @@ function Subscriptions({ isFocused }) {
   const [refreshCount, setRefreshCount] = useState(0);
 
   useEffect(() => {
+    if (!isFocused) return;
+
     async function loadMeetups() {
       setLoading(true);
 

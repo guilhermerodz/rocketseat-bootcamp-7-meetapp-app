@@ -50,9 +50,11 @@ function Dashboard({ isFocused }) {
   useEffect(() => {
     setMeetups([]);
     setPage(1);
-  }, [date]);
+  }, [date, isFocused]);
 
   useEffect(() => {
+    if (!isFocused) return;
+
     async function loadMeetups() {
       setLoading(true);
 
